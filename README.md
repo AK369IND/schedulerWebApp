@@ -1,3 +1,8 @@
+YT Link for video presentation:
+https://youtu.be/KUMUhMVcOM0
+
+This project was the final project of CS50x course by HarvardX (Prof. David J. Malan) which I completed.
+
 Project: 'Schedge'
 It is a flask full stack web application that is basically a scheduler, with email alerts and tables with multiple participants (RDBMS).
 
