@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Log In
+{% endblock %}
+
+{% block main %}
+    <form action="/login" method="post">
+        <div class="form-group">
+            <input autocomplete="off" autofocus class="form-control" name="username" placeholder="Username" type="text" required>
+        </div>
+        <div class="form-group">
+            <input class="form-control" name="password" placeholder="Password" type="password" id = "pass_word"required>
+        </div>
+        <div>
+            <input type = "checkbox" onclick="show_password()">&nbspShow Password
+        </div>
+        <br>
+        <button class="btn btn-primary" type="submit">Log In</button>
+    </form>
+
+<script>
+    function show_password() 
+    {
+        var x = document.getElementById("pass_word");
+        if (x.type === "password") 
+        {
+            x.type = "text";
+        } 
+        else 
+        {
+            x.type = "password";
+        }
+    }
+</script>
+{% endblock %}

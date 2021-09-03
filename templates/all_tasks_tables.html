@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    All
+{% endblock %}
+
+{% block main %}
+{% if all_count == 0 %}
+    <h2>No Tables to turn yet ;)</h2>
+    <br>
+    <button type="button" class="btn bg-info text-white" data-toggle="modal" data-target="#new_tasks_table_modal">
+        New Tasks Table
+    </button>
+{% else %}    
+    <div class="container">
+        <h2>All Task Tables</h2>
+        <br>
+        <button type="button" class="btn bg-info text-white" data-toggle="modal" data-target="#new_tasks_table_modal">
+            New Task Table
+        </button>
+        <br><br>
+        <div class="card-columns">
+          {% for i in range(all_count) %}
+          <a href={{ url_for("tasks_table", table_id=all_tasks_tables[i]["table_id"]) }} class="stretch">
+            <div class="card black border_tasks">
+              <div class="card-body text-center">
+                <p class="card-text table_name">{{ all_tasks_tables[i]["table_name"] }}</p>
+              </div>
+            </div>
+          </a>
+          {% endfor %}
+        </div>  
+    </div>
+{% endif %}   
+
+<!-- new_tasks_table_modal -->
+<div class="modal fade" id="new_tasks_table_modal" role="dialog">
+    <div class="modal-dialog modal-lg">
+    
+        <!-- new_tasks_table_modal content-->
+        <div class="modal-content table_bg">
+            <div class="modal-header">
+                <h4 class="modal-title">New Tasks Table</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+  
+            <div class="modal-body">
+              <form action="/new_tasks_table" method="post">
+                <div class="form-group">
+                    <input autocomplete="off" autofocus class="form-control" name="tab_name" placeholder="Tasks Table Name" type="text" required>
+                </div>
+                <button class="btn btn-primary" type="submit">Create</button>
+              </form>
+            </div>
+  
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+  </div>
+{% endblock %}  

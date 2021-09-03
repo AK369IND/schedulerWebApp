@@ -1,0 +1,138 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    {{ table_info[0]["table_name"] }}
+{% endblock %}
+
+{% block main %}
+<h2>{{ table_info[0]["table_name"] }}</h2><br>
+
+{% if table_info[0]["admin"] == session.user_id %}
+    
+    <a href="{{ url_for("delete_tasks_table", table_id=table_info[0]["table_id"]) }}" class="btn btn-default bg-danger text-white float-left" onclick="return confirm('Are you sure, you want to delete this tasks table?')">
+        Delete All Tasks
+    </a>
+
+    <table class="table table-striped table_bg">
+
+        {% set column_count = table_info[0]["dayweek"] + 2 %}
+        <thead>
+            <tr>
+                <!--Column Names-->
+                {% for x in range(column_count) %}
+                    <th>{{ column[x] }}</th>
+                {% endfor %}    
+                   
+                <!--Add New task button that triggers add_task_modal-->
+                <th colspan="{{column_count}}">
+                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#add_task_modal">
+                        Add New Task
+                    </button>
+                </th>
+            
+                <!-- add_task_modal -->
+                <div class="modal fade" id="add_task_modal" role="dialog">
+                    <div class="modal-dialog modal-lg">
+                    
+                        <!-- add_task_modal content-->
+                        <div class="modal-content table_bg">
+                                <div class="modal-header">
+                                    <h4 class="modal-title">New Task</h4>
+                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                </div>
+
+                                <div class="modal-body">
+                                    <form action={{ url_for("add_task", table_id=table_info[0]["table_id"]) }} method="POST">
+                                        <div>
+                                            <label>Date:&nbsp&nbsp</label><input type="date" class="form-control mb-2 mr-sm-2 bg-secondary text-white" name="date">
+                                            <label>Time:&nbsp&nbsp</label><input type="time" class="form-control mb-2 mr-sm-2 bg-secondary text-white" name="time">
+                                        </div>
+                                        <div>
+                                            <select class="form-control mb-2 mr-sm-2 bg-secondary text-white" name="task_remind_min" required>
+                                                <option disabled selected value>Remind before</option>
+                                                <option value="0">On time</option>
+                                                <option value="15">15 Minutes</option>
+                                                <option value="30">30 Minutes</option>
+                                                <option value="60">1 hour</option>
+                                            </select>
+                                        </div>
+                                        <br>
+                                        <div>
+                                            <input type="text" class="form-control mb-2 mr-sm-2 black" placeholder="{{column[2]}}"name="{{column_names[2]}}">
+                                            <div>
+                                                <button type="submit" class="btn btn-primary mb-2 mr-sm-2">Add</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                </div>
+                        </div>
+                    </div>
+                </div>   
+            </tr>
+        </thead>
+            
+        <tbody>
+            {% for i in range(count_tasks) %}
+                <tr>
+                    <!--Each task content-->
+                    {% for j in range(2, column_count + 2) %}
+                        <td>{{ this_tasks_table[i][j] }}</td>
+                    {% endfor %}  
+                        <!--Edit button that triggers a modal. And Delete button -->
+                        <td>
+                            <button class="btn btn-default bg-warning text-white" data-toggle="modal" data-target="#edit_task_modal{{ this_tasks_table[i]["task_id"] }}">Edit</button>
+                            <a href="{{ url_for("delete_task", task_id=this_tasks_table[i]["task_id"]) }}" class="btn btn-default bg-danger text-white" onclick="return confirm('Are you sure? You cannot undo this..!')">Delete</a>
+                        </td>   
+                </tr>
+
+                    <!-- edit_task_modal -->
+                    <div class="modal fade" id="edit_task_modal{{ this_tasks_table[i]["task_id"] }}" role="dialog">
+                        <div class="modal-dialog modal-lg">
+                        
+                            <!-- edit_task_modal content-->
+                            <div class="modal-content table_bg">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title">Edit Task</h4>
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    </div>
+
+                                    <div class="modal-body">
+                                        <form action={{ url_for("edit_task", task_id=this_tasks_table[0]["task_id"]) }} method="POST">
+                                            <div>
+                                                <label>Date:&nbsp&nbsp</label><input type="date" class="form-control mb-2 mr-sm-2 bg-secondary text-white" name="date" value="{{ this_tasks_table[i]["date"] }}">
+                                                <label>Time:&nbsp&nbsp</label><input type="time" class="form-control mb-2 mr-sm-2 bg-secondary text-white" name="time" value="{{ this_tasks_table[i]["time"] }}">
+                                            </div>
+                                            <div>
+                                                <select class="form-control mb-2 mr-sm-2 bg-secondary text-white" name="task_remind_min" required>
+                                                    <option disabled selected value>Remind before</option>
+                                                    <option value="0">On time</option>
+                                                    <option value="15">15 Minutes</option>
+                                                    <option value="30">30 Minutes</option>
+                                                    <option value="60">1 hour</option>
+                                                </select>
+                                            </div>
+                                            <br>
+                                            <div>
+                                                <input type="text" class="form-control mb-2 mr-sm-2 black" placeholder="{{column[2]}}"name="{{column_names[2]}}" value="{{ this_tasks_table[i]["task"] }}">  
+                                                <div>
+                                                    <button type="submit" class="btn btn-primary mb-2 mr-sm-2">Update</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>                   
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+{% endblock %}

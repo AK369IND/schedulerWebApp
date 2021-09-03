@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    My Day
+{% endblock %}
+
+{% block main %}
+{% if my_day_count == 0 %}
+    <h2>No Tasks for today. </h2>
+{% else %}    
+    <div class="container">
+        <h2>My Day</h2>
+        <br>
+        <h5>{{ current_date_formatted }}, {{ days[current_day] }}</h5>
+        <br>
+
+        <table class="table table-striped table_bg">
+            <thead>
+                <th>Time</th>
+                <th>Task</th>
+            </thead>
+            
+            <tbody>
+                {% for i in range(my_day_count) %}   
+                    <tr>  
+                        <td>{{ my_day_tasks[i]["time"] }}</td>
+                        <td>{{ my_day_tasks[i]["task"] }}</td>
+                    </tr>
+                {% endfor %}    
+            </tbody>
+        </table>
+{% endif %}
+{% endblock %}        

@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    All
+{% endblock %}
+
+{% block main %}
+{% if all_count == 0 %}
+    <h2>No Tables to turn yet ;)</h2>
+{% else %}    
+    <div class="container">
+        <h2>All Week Tables</h2>
+        <br>
+        <div class="card-columns">
+          {% for i in range(all_count) %}
+          <a href={{ url_for("table", table_id=all_tabs[i]["table_id"]) }} class="stretch">
+            <div class="card black borders">
+              <div class="card-body text-center">
+                <p class="card-text table_name">{{ all_tabs[i]["table_name"] }}</p>
+                {% if all_tabs[i]["username"] == user_name[0]["username"] %}
+                    <p class="card-text">(Creation)</p>
+                {% else %}  
+                    <p class="card-text">Admin: {{ all_tabs[i]["username"] }}</p>
+                {% endif%}
+                <p class="card-text">Participants: {{ all_tabs[i]["member_count"] }}</p>
+              </div>
+            </div>
+          </a>
+          {% endfor %}
+        </div>  
+    </div>
+{% endif %}    
+{% endblock %}  

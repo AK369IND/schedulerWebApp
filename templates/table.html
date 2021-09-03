@@ -1,0 +1,202 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    {{ table_info[0]["table_name"] }}
+{% endblock %}
+
+{% block main %}
+<h2>{{ table_info[0]["table_name"] }}</h2><br>
+
+{% if table_info[0]["admin"] == session.user_id %}
+    <button type="button" class="btn bg-secondary text-white" data-toggle="modal" data-target="#add_participants_modal">
+        Add Participants 
+    </button>
+    <br>
+    <br>
+    <!-- add_participants_modal -->
+    <div class="modal fade" id="add_participants_modal" role="dialog">
+        <div class="modal-dialog modal-lg">
+        
+            <!-- add_participants_modal content-->
+            <div class="modal-content table_bg">
+                <div class="modal-header">
+                    <h4 class="modal-title">Add Participants</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <div>
+                        You can either share this table's passcode: <b>{{table_info[0]["passcode"]}}</b><br>
+                        The aspirant, registered with Schedge, can enter this unique 6-character code to subscribe to this table. 
+                    </div>
+                    <div>OR</div>
+                    <div>
+                        Add a participant by filling their username and email here.
+                    </div>
+                    <br>
+                    <form action="{{ url_for("add_participant", table_id=table_info[0]["table_id"]) }}" method="post">
+                        <div>
+                            
+                            <input type="text" class="form-control mb-2 mr-sm-2 black" placeholder="Username" name="username" required>
+                            <input type="email" class="form-control mb-2 mr-sm-2 black" placeholder="Email" name="email" required>
+
+                            <div>
+                                <button type="submit" class="btn btn-primary mb-2 mr-sm-2">Add</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <a href="{{ url_for("delete_table", table_id=table_info[0]["table_id"]) }}" class="btn btn-default bg-danger text-white float-left" onclick="return confirm('Are you sure, you want to delete the table?')">
+        Delete Table
+    </a>
+{% else %}
+<a href="{{ url_for("unsubscribe", table_id=table_info[0]["table_id"]) }}" class="btn btn-default bg-danger text-white" onclick="return confirm('Are you sure, you want to unsubscribe?')">
+    Unsubscribe
+</a>
+<br><br>
+{% endif %}
+    <table class="table table-striped table_bg">
+
+        {% set column_count = table_info[0]["dayweek"] + 2 %}
+        <thead>
+            <tr>
+                <!--Column Names-->
+                {% for x in range(column_count) %}
+                    <th>{{ column[x] }}</th>
+                {% endfor %}    
+                
+                {% if table_info[0]["admin"] == session.user_id %}   
+                    <!--Add New Row button that triggers add_row_modal-->
+                    <th colspan="{{column_count}}">
+                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#add_row_modal">
+                            Add New Row
+                        </button>
+                    </th>
+                
+                    <!-- add_row_modal -->
+                    <div class="modal fade" id="add_row_modal" role="dialog">
+                        <div class="modal-dialog modal-lg">
+                        
+                            <!-- add_row_modal content-->
+                            <div class="modal-content table_bg">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title">New Row</h4>
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    </div>
+
+                                    <div class="modal-body">
+                                        <form action={{ url_for("add_row", table_id=table_info[0]["table_id"]) }} method="POST">
+                                            <div>
+                                                <label>From:&nbsp&nbsp</label><input type="time" class="form-control mb-2 mr-sm-2 bg-secondary text-white" name="from_time" required>
+                                                <label>Till:&nbsp&nbsp</label><input type="time" class="form-control mb-2 mr-sm-2 bg-secondary text-white" name="till_time">
+                                            </div>
+                                            <div>
+                                                <select class="form-control mb-2 mr-sm-2 bg-secondary text-white" name="remind_min" required>
+                                                    <option disabled selected value>Remind before</option>
+                                                    <option value="0">On time</option>
+                                                    <option value="15">15 Minutes</option>
+                                                    <option value="30">30 Minutes</option>
+                                                    <option value="60">1 hour</option>
+                                                </select>
+                                            </div>
+                                            <br>
+                                            <div>
+                                                {% for n in range(2, column_count) %}
+                                                    <input type="text" class="form-control mb-2 mr-sm-2 black" placeholder="{{column[n]}}"name="{{column_names[n]}}">
+                                                {% endfor %}
+                                                <div>
+                                                    <button type="submit" class="btn btn-primary mb-2 mr-sm-2">Add</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}    
+            </tr>
+        </thead>
+            
+        <tbody>
+            {% set row_column_count = column_count + 2 %}
+            {% for i in range(count_rows) %}
+                <tr>
+                    <!--Each row content-->
+                    {% for j in range(2, row_column_count) %}
+                        <td>{{ this_table[i][j] }}</td>
+                    {% endfor %}  
+                    {% if table_info[0]["admin"] == session.user_id %}
+                        <!--Edit button that triggers a modal. And Delete button -->
+                        <td>
+                            <button class="btn btn-default bg-warning text-white" data-toggle="modal" data-target="#edit_row_modal{{ this_table[i]["row_id"] }}">Edit</button>
+                            <a href="{{ url_for("delete_row", row_id=this_table[i]["row_id"]) }}" class="btn btn-default bg-danger text-white" onclick="return confirm('Are you sure? You cannot undo this..!')">Delete</a>
+                        </td>
+                    {% endif %}    
+                </tr>
+
+                {% if table_info[0]["admin"] == session.user_id %}
+                    <!-- edit_row_modal -->
+                    <div class="modal fade" id="edit_row_modal{{ this_table[i]["row_id"] }}" role="dialog">
+                        <div class="modal-dialog modal-lg">
+                        
+                            <!-- edit_row_modal content-->
+                            <div class="modal-content table_bg">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title">Edit Row</h4>
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    </div>
+
+                                    <div class="modal-body">
+                                        <form action={{ url_for("edit_row", row_id=this_table[i]["row_id"]) }} method="POST">
+                                            <input type="hidden" name="row_id" value="{{ this_table[i]["row_id"] }}">
+                                            <div>
+                                                <label>From:&nbsp&nbsp</label><input type="time" class="form-control mb-2 mr-sm-2 bg-secondary text-white" name="from_time" required value="{{ this_table[i]["from_time"] }}">
+                                                <label>Till:&nbsp&nbsp</label><input type="time" class="form-control mb-2 mr-sm-2 bg-secondary text-white" name="till_time" value="{{ this_table[i]["till_time"] }}">
+                                            </div>
+                                            <div>
+                                                <select class="form-control mb-2 mr-sm-2 bg-secondary text-white" name="remind_min" required>
+                                                    <option disabled selected value>Remind before</option>
+                                                    <option value="0">On time</option>
+                                                    <option value="15">15 Minutes</option>
+                                                    <option value="30">30 Minutes</option>
+                                                    <option value="60">1 hour</option>
+                                                </select>
+                                            </div>
+                                            <br>
+                                            <div>
+                                                {% for n in range(2, column_count) %}
+                                                    <div>
+                                                        <label>{{ column[n] }}:&nbsp&nbsp</label><input type="text" class="form-control mb-2 mr-sm-2 black" name="{{column_names[n]}}" value="{{ this_table[i][n + 2] }}">
+                                                    </div>
+                                                {% endfor %}
+                            
+                                                <div>
+                                                    <button type="submit" class="btn btn-primary mb-2 mr-sm-2">Update</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}                    
+            {% endfor %}
+        </tbody>
+    </table>
+    
+{% endblock %}

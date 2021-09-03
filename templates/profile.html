@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    {{ user_info[0]["username"] }}
+{% endblock %}
+
+{% block main %}
+    <h2>Profile</h2>
+    <br>
+    <div>
+        <table class="table table-striped bg_color">
+            <thead>
+                <tr>   
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>
+                        <button type="button" class="btn bg-warning text-white" data-toggle="modal" data-target="#change_username_email_modal">
+                            Change  
+                        </button>
+                        <!-- change_username_email_modal -->
+                        <div class="modal fade" id="change_username_email_modal" role="dialog">
+                            <div class="modal-dialog modal-lg">
+                            
+                                <!-- change_username_email_modal content-->
+                                <div class="modal-content table_bg">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title">Change credentials</h4>
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    </div>
+
+                                    <div class="modal-body">
+                                        <form action="{{ url_for("profile_username_email", profile_id=user_info[0]["id"]) }}" method="post">
+                                            <div>
+                                                
+                                                <label>Username:&nbsp&nbsp</label><input type="text" class="form-control mb-2 mr-sm-2 black" placeholder="Username" name="username" required value="{{ user_info[0]["username"] }}">
+                                                <label>Email:&nbsp&nbsp</label><input type="email" class="form-control mb-2 mr-sm-2 black" placeholder="Email" name="email" required value="{{ user_info[0]["email"] }}">
+
+                                                <div>
+                                                    <button type="submit" class="btn btn-primary mb-2 mr-sm-2">Change</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </th>
+                </tr>    
+            </thead>
+            <tbody>
+                <tr class="profile_font">
+                    <td>{{ user_info[0]["username"] }}</td>
+                    <td>{{ user_info[0]["email"] }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
